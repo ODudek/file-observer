@@ -1,3 +1,3 @@
-if ('tet') {
-    return test;
-}dsadsadasdsadasdsadas
+if (false) {
+	return;
+}
