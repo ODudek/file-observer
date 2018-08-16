@@ -1,13 +1,13 @@
 {
-  "name": "nightwatch-observer",
-  "version": "1.0.0",
+  "name": "file-observer",
+  "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
   "bin": {
     "observer": "./index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jasmine",
     "build:prod": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
     "start": "npm run build:dev && node ./build/index.js"
@@ -19,6 +19,8 @@
     "chalk": "^2.4.1"
   },
   "devDependencies": {
+    "jasmine": "^3.2.0",
+    "jasmine-es6": "^0.4.3",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0",
     "webpack-command": "^0.4.1",

@@ -3,8 +3,9 @@ import chalk from 'chalk';
 import path from 'path';
 import { log, isArray, currentTime } from './helpers';
 import config from './observer.conf';
+
 const ONE_SECOND = 1000;
-class Observer {
+export class Observer {
 	constructor(config) {
         console.clear();
         this.config = config;
@@ -24,8 +25,10 @@ class Observer {
     }
 
     errorHandler(message) {
-        log(chalk.red(message));
-        process.abort();
+        process.on('exit', () => {
+            log(chalk.red(message));
+        })
+        process.exit();
     }
 
     createFileArray() {
@@ -34,7 +37,7 @@ class Observer {
                 this.files.push({ path: filePath, size: fs.statSync(filePath).size });
             });   
         } else {
-
+            this.errorHandler('`files` need to be an array...');
         }
     }
     
