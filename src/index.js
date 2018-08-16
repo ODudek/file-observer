@@ -1,45 +1,64 @@
-const fs = require('fs');
-const chalk = require('chalk');
-const path = require('path');
-const config = require('./observer.conf');
+import fs from 'fs';
+import chalk from 'chalk';
+import path from 'path';
+import { log, isArray, currentTime } from './helpers';
+import config from './observer.conf';
 const ONE_SECOND = 1000;
-const log = console.log;
 class Observer {
 	constructor(config) {
         console.clear();
-        this.filesPath = config.files;
+        this.config = config;
+        this.filesPath = this.config.files;
         this.files = [];
         this.createFileArray();
         this.setup();
     }
 
+    initConfig() {
+        this.clearConsole();
+
+    }
+
+    clearConsole () {
+        this.config.clearAfterChange && console.clear();
+    }
+
+    errorHandler(message) {
+        log(chalk.red(message));
+        process.abort();
+    }
+
     createFileArray() {
-        this.filesPath.map((filePath) => {
-            this.files.push({ path: filePath, size: fs.statSync(filePath).size });
-        });
+        if (isArray(this.filesPath)) {
+            this.filesPath.map((filePath) => {
+                this.files.push({ path: filePath, size: fs.statSync(filePath).size });
+            });   
+        } else {
+
+        }
     }
     
     setup() {
-        this.files.map((file) => {
-            fs.watchFile(path.normalize(file.path), { interval: ONE_SECOND }, (changedFile) => {
+        this.files.map(async (file) => {
+            const watchFile = await fs.watchFile(path.normalize(file.path), { interval: ONE_SECOND }, (changedFile) => {
                 if (changedFile.size !== file.size) {
                     this.watchHandler();
+                    // watchFile.stop();
+                    // console.log('Stopped!')
                 }
             });
         });
     }
 
-    watchHandler() {
-        console.log('File Changed ...');
-        log(chalk.green('File content at: ' + this.displayCurrentTime()))
+    stopWatchFile(watchFile) {
+        watchFile.stop();
+        
     }
 
-    displayCurrentTime() {
-        const date = new Date();
-        const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-        const seconds = date.getSeconds() < 10 ? `0${date.getSeconds}` : date.getSeconds();
-        return `${hours}:${minutes}:${seconds}`;
+    watchHandler() {
+        this.clearConsole();
+        console.log('File Changed ...');
+        log(chalk.green('File content at: ' + currentTime()))
     }
 }
 
