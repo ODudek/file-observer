@@ -1,3 +1,3 @@
-if (false) {
-	return;
+(false) {
+    return;
 }

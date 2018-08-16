@@ -1,33 +1,46 @@
-(function() {
-	console.clear();
-	const fs = require('fs');
-	// const chalk = require('chalk');
-	const config = require('./config');
-	const path = require('path');
-	fs.watchFile(path.normalize(config.file), { interval: 1000 }, () => {
-		console.log('File Changed ...');
-		console.log('File content at : ' + new Date());
-	});
-})();
+const fs = require('fs');
+const chalk = require('chalk');
+const path = require('path');
+const config = require('./observer.conf');
+const ONE_SECOND = 1000;
+const log = console.log;
+class Observer {
+	constructor(config) {
+        console.clear();
+        this.filesPath = config.files;
+        this.files = [];
+        this.createFileArray();
+        this.setup();
+    }
 
-// class Observer {
-// 	constructor(files) {
-// 		this.os = require('os');
-// 		this.fs = require('fs');
-// 		this.chalk = require('chalk');
-// 		this.path = require('path');
-// 		this.files = files;
-// 	}
+    createFileArray() {
+        this.filesPath.map((filePath) => {
+            this.files.push({ path: filePath, size: fs.statSync(filePath).size });
+        });
+    }
+    
+    setup() {
+        this.files.map((file) => {
+            fs.watchFile(path.normalize(file.path), { interval: ONE_SECOND }, (changedFile) => {
+                if (changedFile.size !== file.size) {
+                    this.watchHandler();
+                }
+            });
+        });
+    }
 
-// 	isWindows() {
-// 		return this.os.platform() === 'win32' ? true : false;
-// 	}
+    watchHandler() {
+        console.log('File Changed ...');
+        log(chalk.green('File content at: ' + this.displayCurrentTime()))
+    }
 
-// 	convertPaths() {
-// 		if (this.isWindows()) {
-// 			this.path.join(__dirname)
-// 		}
-// 	}
-// }
+    displayCurrentTime() {
+        const date = new Date();
+        const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+        const seconds = date.getSeconds() < 10 ? `0${date.getSeconds}` : date.getSeconds();
+        return `${hours}:${minutes}:${seconds}`;
+    }
+}
 
-// new Observer()
+new Observer(config)
