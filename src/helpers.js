@@ -7,9 +7,11 @@ const currentTime = () => {
     const seconds = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
     return `${hours}:${minutes}:${seconds}`;
 };
+const isNil = (element) => typeof element === undefined || typeof element === null || element === '' || element.length === 0;
 
 module.exports = {
     isArray,
     log,
-    currentTime
+    currentTime,
+    isNil
 }

@@ -3,6 +3,6 @@ module.exports = {
         'demo/test.js',
         'demo/test2.js'
     ],
-    command: '',
+    command: 'npm test',
     clearAfterChange: true
 }

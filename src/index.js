@@ -1,8 +1,9 @@
 import fs from 'fs';
 import chalk from 'chalk';
 import path from 'path';
-import { log, isArray, currentTime } from './helpers';
+import { log, isNil, isArray, currentTime } from './helpers';
 import config from './observer.conf';
+import { exec } from 'child_process';
 
 const ONE_SECOND = 1000;
 export class Observer {
@@ -13,11 +14,7 @@ export class Observer {
         this.files = [];
         this.createFileArray();
         this.setup();
-    }
-
-    initConfig() {
-        this.clearConsole();
-
+        this.fileChanged;
     }
 
     clearConsole () {
@@ -43,26 +40,29 @@ export class Observer {
     
     setup() {
         this.files.map(async (file) => {
-            const watchFile = await fs.watchFile(path.normalize(file.path), { interval: ONE_SECOND }, (changedFile) => {
+            await fs.watchFile(path.normalize(file.path), { interval: ONE_SECOND }, (changedFile) => {
                 if (changedFile.size !== file.size) {
-                    this.watchHandler();
-                    // watchFile.stop();
-                    // console.log('Stopped!')
+                    this.watchHandler(file.path);
+                    this.runCommand();
                 }
             });
         });
     }
 
-    stopWatchFile(watchFile) {
-        watchFile.stop();
-        
+    watchHandler(fileName) {
+        this.clearConsole();
+        log(chalk.green(`[${currentTime()}] - File ${chalk.white(chalk.bold(fileName))} changed...`));
+        log(`Running ${chalk.blue(config.command)}`);
     }
 
-    watchHandler() {
-        this.clearConsole();
-        console.log('File Changed ...');
-        log(chalk.green('File content at: ' + currentTime()))
+    runCommand() {
+        const command = exec('npm test');
+        command.stdout.on('data', (data) => {
+            if (!isNil(data) || !!data) {
+                console.log('stdout: ', data)
+            }
+        })
     }
 }
 
-new Observer(config)
+new Observer(config);
