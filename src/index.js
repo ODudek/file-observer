@@ -58,8 +58,12 @@ export class Observer {
     runCommand() {
         const command = exec('npm test');
         command.stdout.on('data', (data) => {
-            if (!isNil(data) || !!data) {
-                console.log('stdout: ', data)
+            if (data.includes('fail')) {
+                log(chalk.red(data));
+            } else if (data.includes('pass')) {
+                log(chalk.green(data));
+            } else {
+                log(data);
             }
         })
     }
