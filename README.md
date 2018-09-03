@@ -1,5 +1,5 @@
 # File Observer
-
+[![Build Status](https://travis-ci.org/ODudek/file-observer.svg?branch=master)](https://travis-ci.org/ODudek/file-observer)
 Watch for change in your files and run your command!
 
 ## Config
